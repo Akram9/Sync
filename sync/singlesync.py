@@ -1,6 +1,7 @@
 import hashlib
 import os
 from subprocess import call
+from rsync_alg import blockchecksums, rsyncdelta, patchstream
 
 class Sync:
     def __init__(self, dir1, dir2, oldlog):
@@ -16,6 +17,20 @@ class Sync:
             return(self.dir2)
         else:
             return(self.dir1)
+
+    def patch(self, file1, file2):
+        unpatched = open(file1, 'rb')
+        unpatched.seek(0)
+        hashes = blockchecksums(unpatched)
+
+        patched = open(file2, 'rb')
+        patched.seek(0)
+        delta = rsyncdelta(patched, hashes)
+
+        unpatched.seek(0)
+        save_to = open('newfile', 'wb')
+        patchstream(unpatched, save_to, delta)
+        newfile.close()
 
     def hash_file(self, file):
         if (os.path.isfile(file)):
@@ -42,8 +57,8 @@ class Sync:
                 cont = f.readlines()
             cont = [x.split() for x in cont]
 
-        dates, times, op, obj, paths, dir, filenames = [], [], [], [], [], [], []
-        modfiles, part = [], []
+        dates = times = op = obj = paths = dir = filenames = []
+        modfiles = part = []
 
         for i in range(len(cont)):
             dates.append(cont[i][0])

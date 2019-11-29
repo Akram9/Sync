@@ -1,0 +1,2 @@
+2019-07-21 11:24:20 - Moved file: from /home/akram/Crap/dir1/filo to /home/akram/Crap/dir1/file0
+2019-07-21 11:24:20 - Modified directory: /home/akram/Crap/dir1

@@ -56,7 +56,7 @@ def rsyncdelta(datastream, remotesignatures, blocksize=4096):
             # Whenever there is a match or the loop is running for the first
             # time, populate the window using weakchecksum instead of rolling
             # through every single byte which takes at least twice as long.
-            window = collections.deque(bytes(datastream.read(blocksize)))
+            window = collections.deque(datastream.read(blocksize))
             checksum, a, b = weakchecksum(window)
 
         try:
@@ -127,10 +127,12 @@ def blockchecksums(instream, blocksize=4096):
     """
     weakhashes = list()
     stronghashes = list()
+    print('\n', type(instream), '\n')
     read = instream.read(blocksize)
+    print('\n', type(bytes(read)), '\n', type(read), '\n')
 
     while read:
-        weakhashes.append(weakchecksum(bytes(read))[0])
+        weakhashes.append(weakchecksum(read)[0])
         stronghashes.append(hashlib.md5(read).hexdigest())
         read = instream.read(blocksize)
 
@@ -145,10 +147,12 @@ def patchstream(instream, outstream, delta):
     blocksize = delta[0]
 
     for element in delta[1:]:
+        print('\npatchstream - ', type(element.encode()), '\n')
         if isinstance(element, int) and blocksize:
+            print('\nhere\n')
             instream.seek(element * blocksize)
             element = instream.read(blocksize)
-        outstream.write(element)
+        outstream.write(element.encode())
 
 
 def rollingchecksum(removed, new, a, b, blocksize=4096):
@@ -168,6 +172,7 @@ def weakchecksum(data):
     """
     a = b = 0
     l = len(data)
+    print('\n', l, '\n', type(data), '\n')
     for i in range(l):
         a += data[i]
         b += (l - i)*data[i]
